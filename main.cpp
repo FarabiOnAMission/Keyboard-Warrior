@@ -1,6 +1,6 @@
 #include<raylib.h>
 #include "main-map.h"
-
+#include "main-akib.cpp"
 
 enum SpriteDirection{
     Left = -1,
@@ -152,7 +152,8 @@ int main(){
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
 
-    
+    Rectangle tentTrigger = { 8.0f * TILE_SIZE, 11.0f * TILE_SIZE, 1.0f * TILE_SIZE, 3.0f * TILE_SIZE };
+
     while(!WindowShouldClose()){
 
       move_player(&Player);
@@ -198,6 +199,13 @@ int main(){
           camera.target.y =  mapHeight - (screenHeight - camera.offset.y);
         }
 
+        //Collision to check if the player entered the house where the main game should begin
+        if(CheckCollisionRecs(Player.dest_rect, tentTrigger)){
+          if(IsKeyPressed(KEY_ENTER)){
+            RunBattle();
+          }
+        }
+
         BeginDrawing();
         ClearBackground(SKYBLUE);
 
@@ -214,6 +222,12 @@ int main(){
             Player.dest_rect, origin, rotation, WHITE);
 
             EndMode2D();
+            //Text to enter main game
+
+            if(CheckCollisionRecs(Player.dest_rect, tentTrigger)){
+              int textWidth = MeasureText("Press ENTER to start Typing Battle", 20);
+              DrawText("Press ENTER to start Typing Battle", (screenWidth - textWidth) / 2, 50, 20, BLACK);
+            }
 
             EndDrawing();
     }

@@ -37,10 +37,7 @@ struct BattlePlayer{
     }
 };
 
-int main(){
-    
-    InitWindow(800 ,800 , "Keyboard Warrior boutta be CRAAZZYYYY");
-    SetTargetFPS(60);
+void RunBattle(){
 
     vector<string>Words;
 
@@ -53,6 +50,7 @@ int main(){
     }
     wordfile.close();
 
+    bool battleIsActive = true;
 
     Color Background = {20 , 160, 193, 255};
     BattlePlayer player;
@@ -67,7 +65,7 @@ int main(){
     int locked_index = -1;
     int level = 1;
 
-    while(!WindowShouldClose()){
+    while(battleIsActive && !WindowShouldClose()){
 
         time = time + GetFrameTime();
         if(time >= enemyspawner){
@@ -138,6 +136,9 @@ int main(){
             typed = GetCharPressed();
         }
 
+        if(IsKeyPressed(KEY_ESCAPE)){
+            battleIsActive = false;
+        }
 
         BeginDrawing();
         ClearBackground(Background);
@@ -158,7 +159,5 @@ int main(){
         }
         EndDrawing();
     }
-
-    CloseWindow();
-    return 0;
+    return;
 }
