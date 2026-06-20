@@ -28,7 +28,7 @@ struct enemy{
 };
 
 
-struct Player{
+struct BattlePlayer{
 
     Rectangle body = {50, 500, 50, 50};
 
@@ -55,7 +55,7 @@ int main(){
 
 
     Color Background = {20 , 160, 193, 255};
-    Player player;
+    BattlePlayer player;
     vector<enemy>v;
 
     bool gameOver=false;

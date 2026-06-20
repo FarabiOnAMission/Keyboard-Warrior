@@ -21,6 +21,14 @@ typedef struct Tileset{
   int tileCount;
 }Tileset;
 
+//Defining the game state
+enum GameState{
+  HUB_WORLD,
+  BATTLE_SCENE
+};
+
+GameState currentState = HUB_WORLD;
+
 void move_player(Sprite *player){
     player->vel.x = 0.0; //initial velocity = 0.0
     if(IsKeyDown(KEY_RIGHT)){
