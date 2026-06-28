@@ -90,24 +90,24 @@ int main(){
     Color C;
 
     if(level==1){
-        enemyTex = enemyTex = LoadTexture("GreenDemonFinal.png");
-        bgTex = LoadTexture("GreenBGFinal.png");
+        enemyTex = enemyTex = LoadTexture("resource/GreenDemonFinal.png");
+        bgTex = LoadTexture("resource/GreenBGFinal.png");
         enemyspawner = 1.5;
         enemyBodySize = 80;
         enemyValue = 2;
         C = GREEN;
     } 
     else if(level==2){
-        enemyTex = enemyTex = LoadTexture("BlueDemonFinal.png");
-        bgTex = LoadTexture("BlueBGFinal.png");
+        enemyTex = enemyTex = LoadTexture("resource/BlueDemonFinal.png");
+        bgTex = LoadTexture("resource/BlueBGFinal.png");
         enemyspawner = 1.3;
         enemyBodySize = 80;
         enemyValue = 3;
         C = BLUE;
     }
     else if(level==3){
-        enemyTex = enemyTex = LoadTexture("RedDemonFinal.png");
-        bgTex = LoadTexture("RedBGFinal.png");
+        enemyTex = enemyTex = LoadTexture("resource/RedDemonFinal.png");
+        bgTex = LoadTexture("resource/RedBGFinal.png");
         enemyspawner = 1.1;
         enemyBodySize = 120;
         enemyValue = 5;
