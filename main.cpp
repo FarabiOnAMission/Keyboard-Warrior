@@ -27,7 +27,7 @@ typedef struct Sprite{
   Rectangle dest_rect; //Where that object will place itself in the Window
   Vector2 vel; //Vector to track velocity of a object
   SpriteDirection dir; //to track which position a object is facing
-
+  bool isGrounded; //To check if the player is on ground or not
   //------ANIMATION----------
   int currentFrame;
   float frameTimer;
@@ -66,8 +66,9 @@ void move_player(Sprite *player){
         player->state = STATE_RUN;
     }
 
-    if(IsKeyPressed(KEY_SPACE) &&  player->vel.y == 0.0f){
+    if(IsKeyPressed(KEY_SPACE) &&  player->isGrounded){
         player->vel.y = -600.0f; //go up 
+        player->isGrounded = false;
     }
 
     if (player->state != previousState) {
@@ -138,6 +139,7 @@ void DrawMapLayer(const int MapArray[ROWS][COLS], Tileset tilesets[], int tilese
 
 int main(){
   InitWindow(800,600,"game");
+  SetTargetFPS(60);
 
     Texture2D texGround     = LoadTexture("resource/Floor Tiles1.png");
     Texture2D texSky        = LoadTexture("resource/GandalfHardcore Background layers_layer 5.png");
@@ -176,7 +178,7 @@ int main(){
         .state = STATE_IDLE,
         .dest_rect = destRect,
         .dir = Right,
-
+        .isGrounded = false,
         .currentFrame = 0, //start at frame 0
         .frameTimer = 0.0f,
         .frameSpeed = 0.1f //Change every 0.15 seconds
@@ -196,7 +198,6 @@ int main(){
       { texBgTrees,   32, 976,  320  },
       { texClouds,    3,  1296, 3    },
       { texSun,       1,  1299, 1    }
-
     };
 
     Camera2D camera = {0};
@@ -228,10 +229,13 @@ int main(){
       if(playerBottomTileY >=0 && playerBottomTileY < ROWS
       && playerCenterTileX >=0 && playerCenterTileX < COLS){
 
+        Player.isGrounded = false;
+
         if(groundLayer[playerBottomTileY][playerCenterTileX]!=0){
-          if(Player.vel.y>0){
+          if(Player.vel.y>=0){
                 Player.dest_rect.y = (playerBottomTileY * TILE_SIZE) - Player.dest_rect.height + feetOffset;
                 Player.vel.y = 0.0f;
+                Player.isGrounded = true;
             }
         }
       }
@@ -293,13 +297,19 @@ int main(){
         float currentFrameWidth = (float)currentTexture.width / frame_width;
         float currentFrameHeight = (float)currentTexture.height;
 
-        Player.dest_rect.width = currentFrameWidth * scaleMultiplier;
-        Player.dest_rect.height = currentFrameHeight * scaleMultiplier;
+        Rectangle drawRect;
+        drawRect.width = currentFrameWidth * scaleMultiplier;
+        drawRect.height = currentFrameHeight * scaleMultiplier;
+
+        drawRect.x = Player.dest_rect.x - (drawRect.width - Player.dest_rect.width) / 2.0f;
+        float visualYOffset = (Player.state == STATE_RUN) ? 22.0f : 0.0f;
+        drawRect.y = (Player.dest_rect.y + Player.dest_rect.height) - drawRect.height + visualYOffset;
+
 
 
         DrawTexturePro(currentTexture,
-            {Player.currentFrame* currentFrameWidth, 0.0f ,currentFrameWidth * static_cast<float>(Player.dir), currentFrameHeight},
-            Player.dest_rect, origin, rotation, WHITE);
+            {Player.currentFrame * currentFrameWidth, 0.0f, currentFrameWidth * static_cast<float>(Player.dir), currentFrameHeight},
+            drawRect, origin, rotation, WHITE);
 
             EndMode2D();
             //Text to enter main game
