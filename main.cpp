@@ -1,6 +1,7 @@
 #include<raylib.h>
 #include "main-map.h"
 #include "PrototypeGame.cpp"
+#include "SettingMenu.cpp"
 
 #define IDLE_LAST_FRAME 3
 #define IDLE_FIRST_FRAME 0
@@ -208,6 +209,7 @@ int main(){
     SetExitKey(KEY_NULL);
     bool exitGame = false;
     Rectangle tentTrigger = { 8.0f * TILE_SIZE, 11.0f * TILE_SIZE, 1.0f * TILE_SIZE, 3.0f * TILE_SIZE };
+    Rectangle settingsTrigger = { 27.0f * TILE_SIZE, 11.0f * TILE_SIZE, 2.0f * TILE_SIZE, 3.0f * TILE_SIZE };
     Rectangle exitTrigger = { 46.0f * TILE_SIZE, 11.0f * TILE_SIZE, 2.0f * TILE_SIZE, 3.0f * TILE_SIZE };
 
     while(!exitGame && !WindowShouldClose()){
@@ -260,6 +262,12 @@ int main(){
         if(CheckCollisionRecs(Player.dest_rect, tentTrigger)){
           if(IsKeyPressed(KEY_ENTER)){
             RunBattle();
+          }
+        }
+
+        if(CheckCollisionRecs(Player.dest_rect, settingsTrigger)){
+          if(IsKeyPressed(KEY_ENTER)){
+            RunSettings(); 
           }
         }
 
