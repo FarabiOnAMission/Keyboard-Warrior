@@ -1,17 +1,37 @@
 #include<raylib.h>
 #include "main-map.h"
-#include "main-akib.cpp"
+#include "PrototypeGame.cpp"
 
+#define IDLE_LAST_FRAME 3
+#define IDLE_FIRST_FRAME 0
+
+//Character Definition Section
+
+//Movement Direction of The Character
 enum SpriteDirection{
     Left = -1,
     Right = 1
 };
 
+//PlayerState
+enum PlayerState{
+  STATE_IDLE,
+  STATE_RUN
+};
+
 typedef struct Sprite{
-  Texture2D texture; //Texture to Wrap around a object
+  Texture2D idle_texture; //Texture to Wrap around a object
+  Texture2D run_texture;
+  PlayerState state;
   Rectangle dest_rect; //Where that object will place itself in the Window
   Vector2 vel; //Vector to track velocity of a object
   SpriteDirection dir; //to track which position a object is facing
+  PlayerState state;
+
+  //------ANIMATION----------
+  int currentFrame;
+  float frameTimer;
+  float frameSpeed;
 }Sprite;
 
 typedef struct Tileset{
@@ -23,22 +43,26 @@ typedef struct Tileset{
 
 //Defining the game state
 enum GameState{
-  HUB_WORLD,
-  BATTLE_SCENE
+  HUB_WORLD, //Main Menu
+  BATTLE_SCENE //Main Game
 };
 
-GameState currentState = HUB_WORLD;
+GameState currentState = HUB_WORLD; //Starting Position of the Game which is the Main Menu
 
 void move_player(Sprite *player){
     player->vel.x = 0.0; //initial velocity = 0.0
+    player->state = STATE_IDLE;
+
     if(IsKeyDown(KEY_RIGHT)){
         player->vel.x = 100.0f; //right key and becomes 100.0f constant
         player->dir = Right; //player is facing right
-    }
+        player->state = STATE_RUN;
+      }
 
     if(IsKeyDown(KEY_LEFT)){
         player->vel.x = -100.0f; //left key and becomes -100.0f constant
         player->dir = Left; //player is facing left 
+        player->state = STATE_RUN;
 
     }
 
@@ -48,7 +72,7 @@ void move_player(Sprite *player){
 }
 
 void apply_gravity(Sprite *player){
-  player->vel.y += 2000.0f * GetFrameTime();
+  player->vel.y += 2000.0f * GetFrameTime(); //will always fall down as it does in concept of gravity untill they hit a wall of collision/ground
 
   if(player->vel.y >500.0f){
     player->vel.y = 500.0f; //gravity to fall down
@@ -60,7 +84,23 @@ void apply_velocity(Sprite *player){
     player->dest_rect.y += player->vel.y * GetFrameTime();
 }
 
+void AnimatePlayer(Sprite *player){
+  player->frameTimer += GetFrameTime();
 
+  if(player->frameTimer >= player->frameSpeed){
+    player->frameTimer = 0.0f;
+    player->currentFrame++;
+  }
+
+  int maxFrames = (player->state == STATE_RUN ? 8 : 4);
+
+  if(player->currentFrame >maxFrames ){
+    player->currentFrame = 0;
+  }
+}
+
+
+//Map for Drawing
 void DrawMapLayer(const int MapArray[ROWS][COLS], Tileset tilesets[], int tilesetCount){
   for(int row=0;row<ROWS;row++){
     for(int col=0;col<COLS;col++){
@@ -108,6 +148,7 @@ int main(){
     Texture2D texSun        = LoadTexture("resource/sun.png");
 
   Texture2D player_idle_texture = LoadTexture("resource/Idle-Sheet.png");
+  Texture2D player_run_texture = LoadTexture("resource/Run-Sheet.png");
   
   float frameWidth = (float)player_idle_texture.width/4.0f; //Because my original frame has 4 characters so i need to start it from the beginning
   float frameHeight = (float)player_idle_texture.height;
@@ -125,9 +166,16 @@ int main(){
   float rotation = 0.0f;
 
     Sprite Player = (Sprite){
-        .texture = player_idle_texture,
+        .idle_texture = player_idle_texture,
+        .run_texture = player_run_texture,
+        .state = STATE_IDLE,
         .dest_rect = destRect,
-        .dir = Right
+        .dir = Right,
+
+        .currentFrame = 0, //start at frame 0
+        .frameTimer = 0.0f,
+        .frameSpeed = 0.15f //Change every 0.15 seconds
+
     };
     
     const int TOTAL_TILESETS = 12;
@@ -152,14 +200,20 @@ int main(){
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
 
-    Rectangle tentTrigger = { 8.0f * TILE_SIZE, 11.0f * TILE_SIZE, 1.0f * TILE_SIZE, 3.0f * TILE_SIZE };
+    
 
-    while(!WindowShouldClose()){
+    SetExitKey(KEY_NULL);
+    bool exitGame = false;
+    Rectangle tentTrigger = { 8.0f * TILE_SIZE, 11.0f * TILE_SIZE, 1.0f * TILE_SIZE, 3.0f * TILE_SIZE };
+    Rectangle exitTrigger = { 46.0f * TILE_SIZE, 11.0f * TILE_SIZE, 2.0f * TILE_SIZE, 3.0f * TILE_SIZE };
+
+    while(!exitGame && !WindowShouldClose()){
 
       move_player(&Player);
       apply_gravity(&Player);
 
       apply_velocity(&Player);
+      AnimatePlayer(&Player);
 
       int feetOffset = 0.0f;
 
@@ -206,6 +260,12 @@ int main(){
           }
         }
 
+        if(CheckCollisionRecs(Player.dest_rect, exitTrigger)){
+          if(IsKeyPressed(KEY_ENTER)){
+            exitGame = true;
+          }
+        }
+
         BeginDrawing();
         ClearBackground(SKYBLUE);
 
@@ -218,7 +278,7 @@ int main(){
         DrawMapLayer(groundLayer, gameTilesets, TOTAL_TILESETS);
 
         DrawTexturePro(Player.texture,
-            {frameIndex* frameWidth, 0.0f ,frameWidth * static_cast<float>(Player.dir), frameHeight},
+            {Player.currentFrame* frameWidth, 0.0f ,frameWidth * static_cast<float>(Player.dir), frameHeight},
             Player.dest_rect, origin, rotation, WHITE);
 
             EndMode2D();
@@ -228,6 +288,8 @@ int main(){
               int textWidth = MeasureText("Press ENTER to start Typing Battle", 20);
               DrawText("Press ENTER to start Typing Battle", (screenWidth - textWidth) / 2, 50, 20, BLACK);
             }
+
+            
 
             EndDrawing();
     }

@@ -61,7 +61,7 @@ struct enemy{
 };
 
 
-struct Player{
+struct BattlePlayer{
 
     Rectangle body = {50, 500, 50, 50};
 
@@ -70,7 +70,7 @@ struct Player{
     }
 };
 
-int main(){
+void RunBattle(){
 
     int level = 1;
 
@@ -78,7 +78,8 @@ int main(){
     bool locked = false;
     int locked_index = -1;
 
-    InitWindow(800 ,800 , "Keyboard Warrior boutta be CRAAZZYYYY");
+    SetWindowSize(800, 800); 
+    SetWindowTitle("Keyboard Warrior boutta be CRAAZZYYYY");
     SetTargetFPS(60);
     
     
@@ -127,7 +128,7 @@ int main(){
 
 
     Color Background = {20 , 160, 193, 255};
-    Player player;
+    BattlePlayer player;
     vector<enemy>v;
 
     bool gameOver=false;
@@ -261,8 +262,8 @@ int main(){
     UnloadTexture(bgTex);
 
 
-    CloseWindow();
-    return 0;
+    SetWindowSize(800, 600);
+    SetWindowTitle("game");
 }
 
 
