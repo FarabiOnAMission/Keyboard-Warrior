@@ -26,7 +26,6 @@ typedef struct Sprite{
   Rectangle dest_rect; //Where that object will place itself in the Window
   Vector2 vel; //Vector to track velocity of a object
   SpriteDirection dir; //to track which position a object is facing
-  PlayerState state;
 
   //------ANIMATION----------
   int currentFrame;
@@ -50,24 +49,29 @@ enum GameState{
 GameState currentState = HUB_WORLD; //Starting Position of the Game which is the Main Menu
 
 void move_player(Sprite *player){
+    PlayerState previousState = player->state;
     player->vel.x = 0.0; //initial velocity = 0.0
     player->state = STATE_IDLE;
-
-    if(IsKeyDown(KEY_RIGHT)){
+    
+    if(IsKeyDown(KEY_RIGHT)){  
         player->vel.x = 100.0f; //right key and becomes 100.0f constant
         player->dir = Right; //player is facing right
         player->state = STATE_RUN;
       }
 
-    if(IsKeyDown(KEY_LEFT)){
+    else if(IsKeyDown(KEY_LEFT)){
         player->vel.x = -100.0f; //left key and becomes -100.0f constant
         player->dir = Left; //player is facing left 
         player->state = STATE_RUN;
-
     }
 
-    if(IsKeyPressed(KEY_SPACE)){
+    if(IsKeyPressed(KEY_SPACE) &&  player->vel.y == 0.0f){
         player->vel.y = -600.0f; //go up 
+    }
+
+    if (player->state != previousState) {
+        player->currentFrame = 0;
+        player->frameTimer = 0.0f;
     }
 }
 
@@ -94,7 +98,7 @@ void AnimatePlayer(Sprite *player){
 
   int maxFrames = (player->state == STATE_RUN ? 8 : 4);
 
-  if(player->currentFrame >maxFrames ){
+  if(player->currentFrame >= maxFrames ){
     player->currentFrame = 0;
   }
 }
@@ -174,8 +178,7 @@ int main(){
 
         .currentFrame = 0, //start at frame 0
         .frameTimer = 0.0f,
-        .frameSpeed = 0.15f //Change every 0.15 seconds
-
+        .frameSpeed = 0.1f //Change every 0.15 seconds
     };
     
     const int TOTAL_TILESETS = 12;
@@ -277,8 +280,17 @@ int main(){
         DrawMapLayer(houseLayer, gameTilesets, TOTAL_TILESETS);
         DrawMapLayer(groundLayer, gameTilesets, TOTAL_TILESETS);
 
-        DrawTexturePro(Player.texture,
-            {Player.currentFrame* frameWidth, 0.0f ,frameWidth * static_cast<float>(Player.dir), frameHeight},
+        Texture2D currentTexture = (Player.state == STATE_RUN) ? Player.run_texture : Player.idle_texture;
+        float frame_width = (Player.state == STATE_RUN) ? 8.0f : 4.0f;
+        float currentFrameWidth = (float)currentTexture.width / frame_width;
+        float currentFrameHeight = (float)currentTexture.height;
+
+        Player.dest_rect.width = currentFrameWidth * scaleMultiplier;
+        Player.dest_rect.height = currentFrameHeight * scaleMultiplier;
+
+
+        DrawTexturePro(currentTexture,
+            {Player.currentFrame* currentFrameWidth, 0.0f ,currentFrameWidth * static_cast<float>(Player.dir), currentFrameHeight},
             Player.dest_rect, origin, rotation, WHITE);
 
             EndMode2D();
@@ -288,9 +300,7 @@ int main(){
               int textWidth = MeasureText("Press ENTER to start Typing Battle", 20);
               DrawText("Press ENTER to start Typing Battle", (screenWidth - textWidth) / 2, 50, 20, BLACK);
             }
-
             
-
             EndDrawing();
     }
 
@@ -306,6 +316,7 @@ int main(){
     UnloadTexture(texBgTrees);
     UnloadTexture(texClouds);
     UnloadTexture(player_idle_texture);
+    UnloadTexture(player_run_texture);
     CloseWindow();
 
     return 0;
