@@ -196,7 +196,8 @@ void RunBattle(int level){
     
 
     // Teammate's Pause Feature Initialization
-    bool isPaused = false; 
+    bool isPaused = false;
+    int pauseSelection = 0;
 
     while(!WindowShouldClose()){
 
@@ -206,6 +207,29 @@ void RunBattle(int level){
         // Toggle the pause menu
         if (IsKeyPressed(KEY_ESCAPE)) {
             isPaused = !isPaused;
+            pauseSelection = 0;
+        }
+        if(isPaused){
+            if(IsKeyPressed(KEY_DOWN)){
+                pauseSelection++;
+                if(pauseSelection > 2) pauseSelection = 0;
+            }
+            if(IsKeyPressed(KEY_UP)){
+                pauseSelection--;
+                if(pauseSelection < 0) pauseSelection = 2;
+            }
+            if(IsKeyPressed(KEY_ENTER)){
+                if(pauseSelection == 0){
+                    isPaused = 0;
+                }
+                else if(pauseSelection == 1){
+                    return;
+                }
+                else {
+                    CloseWindow();
+                    exit(0);
+                }
+            }
         }
 
         // Only update game mechanics if NOT paused
@@ -424,11 +448,30 @@ void RunBattle(int level){
 
         // Teammate's Pause Screen Overlay
         if (isPaused) {
-            DrawRectangle(0, 0, 800, 800, Fade(BLACK, 0.6f)); 
-            int textWidth = MeasureText("PAUSED", 60);
-            DrawText("PAUSED", (800 - textWidth) / 2, 350, 60, WHITE);
-            int subTextWidth = MeasureText("Press ESC to Resume", 20);
-            DrawText("Press ESC to Resume", (800 - subTextWidth) / 2, 430, 20, LIGHTGRAY);
+            // Draw the dark overlay
+            DrawRectangle(0, 0, 800, 800, Fade(BLACK, 0.8f)); 
+            
+            // Draw the PAUSED title
+            int titleWidth = MeasureText("PAUSED", 60);
+            DrawText("PAUSED", (800 - titleWidth) / 2, 250, 60, WHITE);
+
+            // Draw the 3 options
+            const char* options[3] = {"Resume", "Return to Main Menu", "Exit Game"};
+            
+            for (int i = 0; i < 3; i++) {
+                Color textColor = LIGHTGRAY;
+                
+                // If this is the currently selected option, make it Yellow and add a cursor
+                if (i == pauseSelection) {
+                    textColor = YELLOW;
+                    int optWidth = MeasureText(options[i], 30);
+                    DrawText(">", (800 - optWidth) / 2 - 30, 380 + (i * 60), 30, YELLOW);
+                }
+
+                // Draw the actual option text
+                int optWidth = MeasureText(options[i], 30);
+                DrawText(options[i], (800 - optWidth) / 2, 380 + (i * 60), 30, textColor);
+            }
         }
 
         EndDrawing();
