@@ -395,5 +395,3 @@ void RunBattle(int level){
 
     CloseWindow();
 }
-
-// g++ PrototypeGame.cpp -o PrototypeGame -lraylib -lm -lpthread -ldl && ./PrototypeGame
