@@ -10,7 +10,7 @@ struct Bullet {
     float speedX, speedY;
     bool active = true;
     
-    int targetId; // <--- This is what was missing!
+    int targetId; 
 
     void update() {
         body.x += speedX * GetFrameTime();

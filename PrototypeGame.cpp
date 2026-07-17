@@ -91,6 +91,22 @@ struct BattlePlayer {
     }
 };
 
+int HighScoreTrack(){
+    int highscore = 0;
+    std::ifstream HighScores("highscore.save");
+    if(HighScores.is_open()){
+        HighScores>>highscore;
+        HighScores.close();
+    }
+    return highscore;
+}
+void SaveHighScore(int newScore){
+    std::ofstream HighScore("highscore.save");
+    if (HighScore.is_open()){
+        HighScore<<newScore;
+        HighScore.close();
+    }
+}
 
 void RunBattle(){
     int level=2;
@@ -210,6 +226,11 @@ void RunBattle(){
                 v[i].update();
                 if(CheckCollisionRecs(v[i].body, player.body)){
                     gameOver = true;
+                    int currentHighScore = HighScoreTrack();
+                    if (score > currentHighScore) {
+                        currentHighScore = score;
+                        SaveHighScore(currentHighScore);
+                    }
                     break;
                 }
             }
