@@ -1,10 +1,10 @@
+#pragma once
 #include <raylib.h>
-#include<vector>
-#include<string>
-#include<math.h>
+#include <vector>
+#include <string>
+#include <math.h>
 #include <fstream>
 using namespace std;
-
 
 struct Bullet {
     Rectangle body;
@@ -23,7 +23,6 @@ struct Bullet {
         DrawTexturePro(*tex,{0, 0, (float)tex->width, (float)tex->height},body, {body.width / 2, body.height / 2},angle,WHITE);
     }
 };
-
 
 struct enemy {    
     string s;
@@ -82,7 +81,6 @@ struct enemy {
     }
 };
 
-
 struct BattlePlayer {
     Rectangle body = {50, 500, 50, 50};
 
@@ -100,6 +98,7 @@ int HighScoreTrack(){
     }
     return highscore;
 }
+
 void SaveHighScore(int newScore){
     std::ofstream HighScore("highscore.save");
     if (HighScore.is_open()){
@@ -134,7 +133,6 @@ void RunBattle(int level){
         enemyBodySize = 80;
         enemyValue    = 2;
         C = GREEN;
-
         battleMusic = LoadMusicStream("resource/level1.ogg");
     }
     else if(level == 2){
@@ -181,176 +179,195 @@ void RunBattle(int level){
     bool gameOver = false;
     int score = 0;
     int enemyIdCounter = 0;
+    
+    // Teammate's Pause Feature Initialization
+    bool isPaused = false; 
 
     while(!WindowShouldClose()){
 
-        time += GetFrameTime();
+        // Keep the music running even if the game is paused!
+        UpdateMusicStream(battleMusic); 
 
-        UpdateMusicStream(battleMusic);
-
-        if(time >= enemyspawner){
-            time = 0;
-            enemy NewEnemy;
-            NewEnemy.tex = &enemyTex;
-            NewEnemy.id  = enemyIdCounter++;
-
-            if(level == 1){
-                NewEnemy.frameSpeed   = 0.1f;
-                NewEnemy.totalFrames  = 16;
-                NewEnemy.cols         = 4;
-                NewEnemy.frameW       = 200;
-                NewEnemy.frameH       = 200;
-            }
-            else if(level == 2){
-                NewEnemy.frameSpeed   = 0.1f;
-                NewEnemy.totalFrames  = 16;
-                NewEnemy.cols         = 4;
-                NewEnemy.frameW       = 200;
-                NewEnemy.frameH       = 200;
-            }
-            else if(level == 3){
-                NewEnemy.frameSpeed   = 0.1f;
-                NewEnemy.totalFrames  = 4;
-                NewEnemy.cols         = 2;
-                NewEnemy.frameW       = 100;
-                NewEnemy.frameH       = 100;
-            }
-
-            int i = GetRandomValue(0, Words.size()-1);
-            NewEnemy.s      = Words[i];
-            NewEnemy.health = Words[i].length();
-            float valY      = GetRandomValue(50, 750);
-            float textwidth = MeasureText(Words[i].c_str(), 20);
-            NewEnemy.body   = {800, valY, enemyBodySize, enemyBodySize};
-            NewEnemy.text   = {800, valY - 20, textwidth + 10, 20};
-            float distanceX = -750;
-            float distanceY = 500 - valY;
-            float distance  = sqrt((distanceX * distanceX) + (distanceY * distanceY));
-            NewEnemy.speedX = (distanceX / distance) * 100;
-            NewEnemy.speedY = (distanceY / distance) * 100;
-            v.push_back(NewEnemy);
+        // Toggle the pause menu
+        if (IsKeyPressed(KEY_ESCAPE)) {
+            isPaused = !isPaused;
         }
 
-        if(!gameOver){
+        // Only update game mechanics if NOT paused
+        if (!isPaused) {
+            
+            if(!gameOver){
+                time += GetFrameTime();
 
-            for(int i = 0; i < (int)v.size(); i++){
-                v[i].update();
-                if(CheckCollisionRecs(v[i].body, player.body)){
-                    gameOver = true;
-                    int currentHighScore = HighScoreTrack();
-                    if (score > currentHighScore) {
-                        currentHighScore = score;
-                        SaveHighScore(currentHighScore);
+                if(time >= enemyspawner){
+                    time = 0;
+                    enemy NewEnemy;
+                    NewEnemy.tex = &enemyTex;
+                    NewEnemy.id  = enemyIdCounter++;
+
+                    if(level == 1){
+                        NewEnemy.frameSpeed   = 0.1f;
+                        NewEnemy.totalFrames  = 16;
+                        NewEnemy.cols         = 4;
+                        NewEnemy.frameW       = 200;
+                        NewEnemy.frameH       = 200;
                     }
-                    break;
+                    else if(level == 2){
+                        NewEnemy.frameSpeed   = 0.1f;
+                        NewEnemy.totalFrames  = 16;
+                        NewEnemy.cols         = 4;
+                        NewEnemy.frameW       = 200;
+                        NewEnemy.frameH       = 200;
+                    }
+                    else if(level == 3){
+                        NewEnemy.frameSpeed   = 0.1f;
+                        NewEnemy.totalFrames  = 4;
+                        NewEnemy.cols         = 2;
+                        NewEnemy.frameW       = 100;
+                        NewEnemy.frameH       = 100;
+                    }
+
+                    int i = GetRandomValue(0, Words.size()-1);
+                    NewEnemy.s      = Words[i];
+                    NewEnemy.health = Words[i].length();
+                    float valY      = GetRandomValue(50, 750);
+                    float textwidth = MeasureText(Words[i].c_str(), 20);
+                    NewEnemy.body   = {800, valY, enemyBodySize, enemyBodySize};
+                    NewEnemy.text   = {800, valY - 20, textwidth + 10, 20};
+                    float distanceX = -750;
+                    float distanceY = 500 - valY;
+                    float distance  = sqrt((distanceX * distanceX) + (distanceY * distanceY));
+                    NewEnemy.speedX = (distanceX / distance) * 100;
+                    NewEnemy.speedY = (distanceY / distance) * 100;
+                    v.push_back(NewEnemy);
                 }
-            }
 
-            for(int i = 0; i < (int)bullets.size(); i++){
-                bullets[i].update();
-
-                for(int j = 0; j < (int)v.size(); j++){
-                    if(CheckCollisionRecs(bullets[i].body, v[j].body)){
-                        bullets[i].active = false;
-                        v[j].health--;
-                        if(v[j].health <= 0){
-                            v[j].active = false;
+                for(int i = 0; i < (int)v.size(); i++){
+                    v[i].update();
+                    if(CheckCollisionRecs(v[i].body, player.body)){
+                        gameOver = true;
+                        
+                        // Your High Score Feature
+                        int currentHighScore = HighScoreTrack();
+                        if (score > currentHighScore) {
+                            currentHighScore = score;
+                            SaveHighScore(currentHighScore);
                         }
                         break;
                     }
                 }
 
-                if(bullets[i].body.x > 800 || bullets[i].body.x < 0 ||
-                    bullets[i].body.y > 800 || bullets[i].body.y < 0){
-                    bullets[i].active = false;
-                }
-            }
+                for(int i = 0; i < (int)bullets.size(); i++){
+                    bullets[i].update();
 
-            for(int i = (int)bullets.size()-1; i >= 0; i--){
-                if(!bullets[i].active) bullets.erase(bullets.begin() + i);
-            }
+                    for(int j = 0; j < (int)v.size(); j++){
+                        if(CheckCollisionRecs(bullets[i].body, v[j].body)){
+                            bullets[i].active = false;
+                            v[j].health--;
+                            if(v[j].health <= 0){
+                                v[j].active = false;
+                            }
+                            break;
+                        }
+                    }
 
-            for(int i = (int)v.size()-1; i >= 0; i--){
-                if(!v[i].active){
-                    v.erase(v.begin() + i);
-                    score += enemyValue;
-                    if(locked_index == i){
-                        locked = false;
-                        locked_index = -1;
-                    } else if(locked_index > i){
-                        locked_index--;
+                    if(bullets[i].body.x > 800 || bullets[i].body.x < 0 ||
+                        bullets[i].body.y > 800 || bullets[i].body.y < 0){
+                        bullets[i].active = false;
                     }
                 }
-            }
-        }
-        else{
-            if(IsKeyPressed(KEY_ENTER)){
-                gameOver     = false;
-                score        = 0;
-                locked       = false;
-                locked_index = -1;
-                v.clear();
-                bullets.clear();
-                time = 1.9f;
-            }
-        }
 
-        int typed = GetCharPressed();
-        while(typed > 0){
-            char letter = (char)typed;
+                for(int i = (int)bullets.size()-1; i >= 0; i--){
+                    if(!bullets[i].active) bullets.erase(bullets.begin() + i);
+                }
 
-            if(!locked){
-                for(int i = 0; i < (int)v.size(); i++){
-                    if(v[i].currentIndex < (int)v[i].s.length() && letter == v[i].s[v[i].currentIndex]){
-                        locked_index = i;
-                        locked = true;
+                for(int i = (int)v.size()-1; i >= 0; i--){
+                    if(!v[i].active){
+                        v.erase(v.begin() + i);
+                        score += enemyValue;
+                        if(locked_index == i){
+                            locked = false;
+                            locked_index = -1;
+                        } else if(locked_index > i){
+                            locked_index--;
+                        }
+                    }
+                }
 
-                        Bullet b;
-                        b.targetId = v[i].id;
-                        b.tex = &arrowTex;
-                        b.body = {player.body.x + 60, player.body.y + 25, 80, 40};
-                        float diffX = v[i].body.x - player.body.x;
-                        float diffY = v[i].body.y - player.body.y;
-                        float dist  = sqrt((diffX * diffX) + (diffY * diffY));
-                        b.speedX = (diffX / dist) * bulletSpeed;
-                        b.speedY = (diffY / dist) * bulletSpeed;
-                        bullets.push_back(b);
+                // Typing Logic
+                int typed = GetCharPressed();
+                while(typed > 0){
+                    char letter = (char)typed;
 
-                        v[i].currentIndex++;
-                        if(v[i].currentIndex >= (int)v[i].s.length()){
+                    if(!locked){
+                        for(int i = 0; i < (int)v.size(); i++){
+                            if(v[i].currentIndex < (int)v[i].s.length() && letter == v[i].s[v[i].currentIndex]){
+                                locked_index = i;
+                                locked = true;
+
+                                Bullet b;
+                                b.targetId = v[i].id;
+                                b.tex = &arrowTex;
+                                b.body = {player.body.x + 60, player.body.y + 25, 80, 40};
+                                float diffX = v[i].body.x - player.body.x;
+                                float diffY = v[i].body.y - player.body.y;
+                                float dist  = sqrt((diffX * diffX) + (diffY * diffY));
+                                b.speedX = (diffX / dist) * bulletSpeed;
+                                b.speedY = (diffY / dist) * bulletSpeed;
+                                bullets.push_back(b);
+
+                                v[i].currentIndex++;
+                                if(v[i].currentIndex >= (int)v[i].s.length()){
+                                    locked = false;
+                                    locked_index = -1;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    else{
+                        if(v[locked_index].currentIndex < (int)v[locked_index].s.length() &&
+                            letter == v[locked_index].s[v[locked_index].currentIndex]){
+
+                            Bullet b;
+                            b.targetId = v[locked_index].id;
+                            b.tex = &arrowTex;
+                            b.body = {player.body.x + 60, player.body.y + 25, 80, 40};
+                            float diffX = v[locked_index].body.x - player.body.x;
+                            float diffY = v[locked_index].body.y - player.body.y;
+                            float dist  = sqrt((diffX * diffX) + (diffY * diffY));
+                            b.speedX = (diffX / dist) * bulletSpeed;
+                            b.speedY = (diffY / dist) * bulletSpeed;
+                            bullets.push_back(b);
+
+                            v[locked_index].currentIndex++;
+                        }
+                        if(v[locked_index].currentIndex >= (int)v[locked_index].s.length()){
                             locked = false;
                             locked_index = -1;
                         }
-                        break;
                     }
+                    typed = GetCharPressed();
                 }
             }
             else{
-                if(v[locked_index].currentIndex < (int)v[locked_index].s.length() &&
-                    letter == v[locked_index].s[v[locked_index].currentIndex]){
-
-                    Bullet b;
-                    b.targetId = v[locked_index].id;
-                    b.tex = &arrowTex;
-                    b.body = {player.body.x + 60, player.body.y + 25, 80, 40};
-                    float diffX = v[locked_index].body.x - player.body.x;
-                    float diffY = v[locked_index].body.y - player.body.y;
-                    float dist  = sqrt((diffX * diffX) + (diffY * diffY));
-                    b.speedX = (diffX / dist) * bulletSpeed;
-                    b.speedY = (diffY / dist) * bulletSpeed;
-                    bullets.push_back(b);
-
-                    v[locked_index].currentIndex++;
-                }
-                if(v[locked_index].currentIndex >= (int)v[locked_index].s.length()){
-                    locked = false;
+                if(IsKeyPressed(KEY_ENTER)){
+                    gameOver     = false;
+                    score        = 0;
+                    locked       = false;
                     locked_index = -1;
+                    v.clear();
+                    bullets.clear();
+                    time = 1.9f;
                 }
             }
-
-            typed = GetCharPressed();
+        } 
+        else {
+            // If the game IS paused, clear the input buffer so players can't cheat by typing early!
+            while (GetCharPressed() > 0) {} 
         }
 
+        // ================= DRAWING =================
         BeginDrawing();
         ClearBackground(Background);
 
@@ -381,6 +398,15 @@ void RunBattle(int level){
             DrawText("Press ENTER to Restart", (800-restartWidth)/2, 430, 20, DARKBLUE);
         }
 
+        // Teammate's Pause Screen Overlay
+        if (isPaused) {
+            DrawRectangle(0, 0, 800, 800, Fade(BLACK, 0.6f)); 
+            int textWidth = MeasureText("PAUSED", 60);
+            DrawText("PAUSED", (800 - textWidth) / 2, 350, 60, WHITE);
+            int subTextWidth = MeasureText("Press ESC to Resume", 20);
+            DrawText("Press ESC to Resume", (800 - subTextWidth) / 2, 430, 20, LIGHTGRAY);
+        }
+
         EndDrawing();
     }
 
@@ -388,7 +414,6 @@ void RunBattle(int level){
     UnloadTexture(arrowTex);
     UnloadTexture(enemyTex);
     UnloadTexture(bgTex);
-
 
     SetWindowSize(800, 600);
     SetWindowTitle("game");
