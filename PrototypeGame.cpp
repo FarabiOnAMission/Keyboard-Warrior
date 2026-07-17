@@ -82,11 +82,12 @@ struct enemy {
 };
 
 struct BattlePlayer {
-    Rectangle body = {50, 500, 100, 100};
+    Rectangle ogbody = {50, 500, 125, 125};
+    Rectangle body = {10, 525, 100, 100};
     Texture2D* tex;
 
     void draw(){
-        DrawTexturePro(*tex,{0, 0, (float)tex->width, (float)tex->height},body,{0, 0},0.0f,WHITE);
+        DrawTexturePro(*tex,{0, 0, (float)tex->width, (float)tex->height},ogbody,{0, 0},0.0f,WHITE);
     }
 };
 
@@ -124,37 +125,41 @@ void RunBattle(int level){
     Texture2D bgTex;
     Texture2D arrowTex;
     Texture2D heroTex;
+    Texture2D platformTex;
     Color C;
     Music battleMusic;
 
     if(level == 1){
+        platformTex = LoadTexture("resource/PlatformGreen.png");
         enemyTex = LoadTexture("resource/GreenDemonFinal.png");
         bgTex    = LoadTexture("resource/GreenBGFinal.png");
         arrowTex = LoadTexture("resource/YellowArrow.png");
         heroTex = LoadTexture("resource/RobinGreen.png");
-        enemyspawner  = 1.5f;
+        enemyspawner  = 1.3f;
         enemyBodySize = 100;
         enemyValue    = 2;
         C = GREEN;
         battleMusic = LoadMusicStream("resource/level1.ogg");
     }
     else if(level == 2){
+        platformTex = LoadTexture("resource/PlatformBlue.png");
         enemyTex = LoadTexture("resource/BlueDemonFinal.png");
         bgTex    = LoadTexture("resource/BlueBGFinal.png");
         arrowTex = LoadTexture("resource/BlueArrow.png");
         heroTex = LoadTexture("resource/RobinBlue.png");
-        enemyspawner  = 1.3f;
+        enemyspawner  = 1.0f;
         enemyBodySize = 130;
         enemyValue    = 3;
         C = BLUE;
         battleMusic = LoadMusicStream("resource/level2.ogg");
     }
     else if(level == 3){
+        platformTex = LoadTexture("resource/PlatformRed.png");
         enemyTex = LoadTexture("resource/RedDemonFinal.png");
         bgTex    = LoadTexture("resource/RedBGFinal.png");
         arrowTex = LoadTexture("resource/RedArrow.png");
         heroTex = LoadTexture("resource/RobinRed.png");
-        enemyspawner  = 1.1f;
+        enemyspawner  = 0.7f;
         enemyBodySize = 140;
         enemyValue    = 5;
         C = RED;
@@ -176,6 +181,9 @@ void RunBattle(int level){
     wordfile.close();
 
     Color Background = {20, 160, 193, 255};
+
+    
+
     BattlePlayer player;
     player.tex = &heroTex;
     vector<enemy> v;
@@ -186,6 +194,7 @@ void RunBattle(int level){
     int score = 0;
     int enemyIdCounter = 0;
     
+
     // Teammate's Pause Feature Initialization
     bool isPaused = false; 
 
@@ -314,7 +323,7 @@ void RunBattle(int level){
                                 Bullet b;
                                 b.targetId = v[i].id;
                                 b.tex = &arrowTex;
-                                b.body = {player.body.x + 60, player.body.y + 50, 80, 40};
+                                b.body = {player.body.x + 60, player.body.y + 50, 80, 80};
                                 float diffX = v[i].body.x - player.body.x;
                                 float diffY = v[i].body.y - player.body.y;
                                 float dist  = sqrt((diffX * diffX) + (diffY * diffY));
@@ -338,7 +347,7 @@ void RunBattle(int level){
                             Bullet b;
                             b.targetId = v[locked_index].id;
                             b.tex = &arrowTex;
-                            b.body = {player.body.x + 60, player.body.y + 50, 80, 40};
+                            b.body = {player.body.x + 95, player.body.y + 50, 80, 80};
                             float diffX = v[locked_index].body.x - player.body.x;
                             float diffY = v[locked_index].body.y - player.body.y;
                             float dist  = sqrt((diffX * diffX) + (diffY * diffY));
@@ -380,6 +389,15 @@ void RunBattle(int level){
         if(!gameOver){
             DrawTexturePro(bgTex, {0,0,(float)bgTex.width,(float)bgTex.height}, {0,0,800,800}, {0,0}, 0.0f, WHITE);
 
+            DrawTexturePro(
+                platformTex,
+                {0, 0, (float)platformTex.width, (float)platformTex.height},
+                {player.body.x - 100, player.body.y + player.body.height - 105, 270, 300},
+                {0, 0},
+                0.0f,
+                WHITE
+            );
+
             player.draw();
 
             for(int i = 0; i < (int)bullets.size(); i++) bullets[i].draw();
@@ -417,6 +435,7 @@ void RunBattle(int level){
     }
 
     UnloadMusicStream(battleMusic);
+    UnloadTexture(platformTex);
     UnloadTexture(arrowTex);
     UnloadTexture(enemyTex);
     UnloadTexture(bgTex);
