@@ -5,26 +5,55 @@
 #include <fstream>
 using namespace std;
 
+struct Bullet {
+    Rectangle body;
+    float speedX, speedY;
+    bool active = true;
+    
+    int targetId; 
 
-struct enemy{    
+    void update() {
+        body.x += speedX * GetFrameTime();
+        body.y += speedY * GetFrameTime();
+    }
+
+    void draw() {
+        DrawRectangleRec(body, YELLOW); 
+    }
+};
+
+struct enemy {    
     string s;
+    int currentIndex = 0; 
+    
     Rectangle body;
     Rectangle text;
     float posX , posY;
     float speedX, speedY; 
+    
+    int health;          
+    bool active = true;  
+    int id; 
+
     void update(){
         body.x = body.x + speedX * GetFrameTime();
         body.y = body.y + speedY * GetFrameTime();
         text.x = text.x + speedX * GetFrameTime();
         text.y = text.y + speedY * GetFrameTime();
-
     }
+    
     void draw(){
         DrawRectangleRec(body, WHITE);
         DrawRectangleRec(text, BLACK);
-        DrawText(s.c_str(), text.x + 5, text.y + 2, 20, WHITE);
+        
+        string typedPart = s.substr(0, currentIndex);
+        string untypedPart = s.substr(currentIndex);
+        
+        DrawText(typedPart.c_str(), text.x + 5, text.y + 2, 20, GRAY);
+        
+        int typedWidth = MeasureText(typedPart.c_str(), 20);
+        DrawText(untypedPart.c_str(), text.x + 5 + typedWidth, text.y + 2, 20, WHITE);
     }
-
 };
 
 
@@ -54,7 +83,9 @@ void RunBattle(){
 
     Color Background = {20 , 160, 193, 255};
     BattlePlayer player;
-    vector<enemy>v;
+    vector<enemy> v;
+    vector<Bullet> bullets;
+    float bulletSpeed = 600.0f;
 
     bool gameOver=false;
 
@@ -73,6 +104,7 @@ void RunBattle(){
             enemy NewEnemy;
             int i = GetRandomValue(0,Words.size()-1);
             NewEnemy.s = Words[i];
+            NewEnemy.health = Words[i].length();
             float valY = GetRandomValue(50,750);
             float textwidth = MeasureText(Words[i].c_str(), 20);
             NewEnemy.body = {800, valY, 30 , 30};
@@ -85,12 +117,49 @@ void RunBattle(){
             v.push_back(NewEnemy);
         }
 
-
         if(!gameOver){
             for(int i = 0; i<(int)v.size() ; i++){
                 v[i].update();
-                    if(CheckCollisionRecs(v[i].body, player.body)){
-                        gameOver = true;
+                if(CheckCollisionRecs(v[i].body, player.body)){
+                    gameOver = true;
+                }
+            }
+            for (int i = 0; i < (int)bullets.size(); i++) {
+                bullets[i].update();
+
+                for (int j = 0; j < (int)v.size(); j++) {
+                    if (CheckCollisionRecs(bullets[i].body, v[j].body)) {
+                        bullets[i].active = false; 
+                        v[j].health--; 
+                        
+                        if (v[j].health <= 0) {
+                            v[j].active = false; 
+                        }
+                        break; 
+                    }
+                }
+
+                if (bullets[i].body.x > 800 || bullets[i].body.x < 0 ||
+                    bullets[i].body.y > 800 || bullets[i].body.y < 0) {
+                    bullets[i].active = false;
+                }
+            }
+
+            for (int i = (int)bullets.size() - 1; i >= 0; i--) {
+                if (!bullets[i].active) {
+                    bullets.erase(bullets.begin() + i);
+                }
+            }
+
+            for (int i = (int)v.size() - 1; i >= 0; i--) {
+                if (!v[i].active) {
+                    v.erase(v.begin() + i);
+                    if (locked_index > i) {
+                        locked_index--;
+                    } else if (locked_index == i) {
+                        locked = false;
+                        locked_index = -1;
+                    }
                 }
             }
         }
@@ -98,41 +167,66 @@ void RunBattle(){
             if (IsKeyPressed(KEY_ENTER)) {
                 gameOver = false;
                 v.clear();
+                bullets.clear();
                 time = 1.9f;
             }   
         }
+
         int typed = GetCharPressed();
         
-        while(typed>0){
-
+        while(typed > 0){
             char letter = (char)typed;
             if(!locked){
-                for(int i=0;i<(int)v.size();i++){
-                    if(letter == v[i].s[0]){
+                for(int i=0; i<(int)v.size(); i++){
+                    // Check the letter at currentIndex instead of index 0
+                    if(v[i].currentIndex < (int)v[i].s.length() && letter == v[i].s[v[i].currentIndex]){
                         locked_index  = i;
                         locked = true;
-                        v[i].s.erase(0,1);
-                        if(v[i].s.empty()){
+                        
+                        // Spawn bullet
+                        Bullet b;
+                        b.targetId = v[i].id; 
+                        b.body = {player.body.x + 25, player.body.y + 25, 10, 5};
+                        float diffX = v[i].body.x - player.body.x;
+                        float diffY = v[i].body.y - player.body.y;
+                        float dist = sqrt((diffX * diffX) + (diffY * diffY));
+                        b.speedX = (diffX / dist) * bulletSpeed;
+                        b.speedY = (diffY / dist) * bulletSpeed;
+                        bullets.push_back(b);
+
+                        v[i].currentIndex++; // Move to the next letter!
+
+                        // If we typed the whole word, unlock from this enemy
+                        if(v[i].currentIndex >= (int)v[i].s.length()){
                             locked = false;
                             locked_index = -1;
-                            v.erase(v.begin() + i);
                         }
                         break;        
                     }
                 }
             }
-
             else{
-                if(letter == v[locked_index].s[0] ){
-                    v[locked_index].s.erase(0,1);
+                if(letter == v[locked_index].s[v[locked_index].currentIndex]){
+                    // Spawn bullet
+                    Bullet b;
+                    b.targetId = v[locked_index].id;
+                    b.body = {player.body.x + 25, player.body.y + 25, 10, 5};
+                    float diffX = v[locked_index].body.x - player.body.x;
+                    float diffY = v[locked_index].body.y - player.body.y;
+                    float dist = sqrt((diffX * diffX) + (diffY * diffY));
+                    b.speedX = (diffX / dist) * bulletSpeed;
+                    b.speedY = (diffY / dist) * bulletSpeed;
+                    bullets.push_back(b);
+
+                    v[locked_index].currentIndex++; // Move forward
                 }
-                if(v[locked_index].s.empty()){
+                
+                // If we typed the whole word, unlock from this enemy
+                if(v[locked_index].currentIndex >= (int)v[locked_index].s.length()){
                     locked = false;
-                    v.erase(v.begin() + locked_index);
                     locked_index = -1;
                 }
             }
-
             typed = GetCharPressed();
         }
 
@@ -142,10 +236,17 @@ void RunBattle(){
 
         BeginDrawing();
         ClearBackground(Background);
+        
         if(!gameOver){
-            player.draw();
-            for(int i = 0; i<(int)v.size() ; i++){
-                v[i].draw();
+            player.draw(); 
+            
+            for(int i = 0; i < (int)bullets.size(); i++){
+                bullets[i].draw(); 
+            }
+
+            
+            for(int i = 0; i < (int)v.size(); i++){
+                v[i].draw(); 
             }
             string leveltext = "LEVEL " + to_string(level);
             int levelWidth = MeasureText(leveltext.c_str(), 30);
@@ -157,6 +258,7 @@ void RunBattle(){
             int restartWidth = MeasureText("Press ENTER to Restart", 20);
             DrawText("Press ENTER to Restart", (800 - restartWidth) / 2, 400, 20, DARKGRAY);
         }
+        
         EndDrawing();
     }
     return;

@@ -3,6 +3,7 @@
 #include "PrototypeGame.cpp"
 #include "SettingMenu.cpp"
 #include "MapChoice.cpp"
+#include <fstream>
 
 #define IDLE_LAST_FRAME 3
 #define IDLE_FIRST_FRAME 0
@@ -137,6 +138,8 @@ void DrawMapLayer(const int MapArray[ROWS][COLS], Tileset tilesets[], int tilese
     }
   }
 }
+
+
 
 int main(){
     InitWindow(800,600,"game");
