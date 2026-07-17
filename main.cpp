@@ -224,38 +224,39 @@ int main(){
 
     while(!exitGame && !WindowShouldClose()){
 
-      move_player(&Player);
-      apply_gravity(&Player);
       UpdateMusicStream(bgMusic);
-      apply_velocity(&Player);
-      AnimatePlayer(&Player);
+      float screenWidth = 800.0f;
+      float screenHeight = 600.0f;
+      float mapWidth = COLS * TILE_SIZE;
+      float mapHeight = ROWS * TILE_SIZE;
+      
+        move_player(&Player);
+        apply_gravity(&Player);
+        apply_velocity(&Player);
+        AnimatePlayer(&Player);
 
-      int feetOffset = 0.0f;
+        int feetOffset = 0.0f;
 
-      int playerBottomTileY = (Player.dest_rect.y + Player.dest_rect.height - feetOffset)/ TILE_SIZE;
-      int playerCenterTileX = (Player.dest_rect.x + (Player.dest_rect.width/2.0f)) / TILE_SIZE;
+        int playerBottomTileY = (Player.dest_rect.y + Player.dest_rect.height - feetOffset)/ TILE_SIZE;
+        int playerCenterTileX = (Player.dest_rect.x + (Player.dest_rect.width/2.0f)) / TILE_SIZE;
 
-      if(playerBottomTileY >=0 && playerBottomTileY < ROWS
-      && playerCenterTileX >=0 && playerCenterTileX < COLS){
+        if(playerBottomTileY >=0 && playerBottomTileY < ROWS
+        && playerCenterTileX >=0 && playerCenterTileX < COLS){
 
-        Player.isGrounded = false;
+          Player.isGrounded = false;
 
-        if(groundLayer[playerBottomTileY][playerCenterTileX]!=0){
-          if(Player.vel.y>=0){
-                Player.dest_rect.y = (playerBottomTileY * TILE_SIZE) - Player.dest_rect.height + feetOffset;
-                Player.vel.y = 0.0f;
-                Player.isGrounded = true;
-            }
+          if(groundLayer[playerBottomTileY][playerCenterTileX]!=0){
+            if(Player.vel.y>=0){
+                  Player.dest_rect.y = (playerBottomTileY * TILE_SIZE) - Player.dest_rect.height + feetOffset;
+                  Player.vel.y = 0.0f;
+                  Player.isGrounded = true;
+              }
+          }
         }
-      }
 
         camera.target.x = (Player.dest_rect.x + (Player.dest_rect.width/ 2.0f));
         camera.target.y = (Player.dest_rect.y + (Player.dest_rect.height/ 2.0f));
 
-        float screenWidth = 800.0f;
-        float screenHeight = 600.0f;
-        float mapWidth = COLS * TILE_SIZE;
-        float mapHeight = ROWS * TILE_SIZE;
 
         if(camera.target.x < camera.offset.x){
           camera.target.x = camera.offset.x;
@@ -289,57 +290,56 @@ int main(){
             exitGame = true;
           }
         }
+      
 
-        BeginDrawing();
-        ClearBackground(SKYBLUE);
+  
+      BeginDrawing();
+      ClearBackground(SKYBLUE);
 
-        BeginMode2D(camera);
+      BeginMode2D(camera);
 
-        DrawMapLayer(skyLayer, gameTilesets, TOTAL_TILESETS);
-        DrawMapLayer(bgTreesLayer, gameTilesets, TOTAL_TILESETS);
-        DrawMapLayer(decorsLayer, gameTilesets, TOTAL_TILESETS);
-        DrawMapLayer(houseLayer, gameTilesets, TOTAL_TILESETS);
-        DrawMapLayer(groundLayer, gameTilesets, TOTAL_TILESETS);
+      DrawMapLayer(skyLayer, gameTilesets, TOTAL_TILESETS);
+      DrawMapLayer(bgTreesLayer, gameTilesets, TOTAL_TILESETS);
+      DrawMapLayer(decorsLayer, gameTilesets, TOTAL_TILESETS);
+      DrawMapLayer(houseLayer, gameTilesets, TOTAL_TILESETS);
+      DrawMapLayer(groundLayer, gameTilesets, TOTAL_TILESETS);
 
-        Texture2D currentTexture = (Player.state == STATE_RUN) ? Player.run_texture : Player.idle_texture;
-        float frame_width = (Player.state == STATE_RUN) ? 8.0f : 4.0f;
-        float currentFrameWidth = (float)currentTexture.width / frame_width;
-        float currentFrameHeight = (float)currentTexture.height;
+      Texture2D currentTexture = (Player.state == STATE_RUN) ? Player.run_texture : Player.idle_texture;
+      float frame_width = (Player.state == STATE_RUN) ? 8.0f : 4.0f;
+      float currentFrameWidth = (float)currentTexture.width / frame_width;
+      float currentFrameHeight = (float)currentTexture.height;
 
-        Rectangle drawRect;
-        drawRect.width = currentFrameWidth * scaleMultiplier;
-        drawRect.height = currentFrameHeight * scaleMultiplier;
+      Rectangle drawRect;
+      drawRect.width = currentFrameWidth * scaleMultiplier;
+      drawRect.height = currentFrameHeight * scaleMultiplier;
 
-        drawRect.x = Player.dest_rect.x - (drawRect.width - Player.dest_rect.width) / 2.0f;
-        float visualYOffset = (Player.state == STATE_RUN) ? 22.0f : 0.0f;
-        drawRect.y = (Player.dest_rect.y + Player.dest_rect.height) - drawRect.height + visualYOffset;
+      drawRect.x = Player.dest_rect.x - (drawRect.width - Player.dest_rect.width) / 2.0f;
+      float visualYOffset = (Player.state == STATE_RUN) ? 22.0f : 0.0f;
+      drawRect.y = (Player.dest_rect.y + Player.dest_rect.height) - drawRect.height + visualYOffset;
 
+      DrawTexturePro(currentTexture,
+          {Player.currentFrame * currentFrameWidth, 0.0f, currentFrameWidth * static_cast<float>(Player.dir), currentFrameHeight},
+          drawRect, origin, rotation, WHITE);
 
+      EndMode2D();
+      
+      if(CheckCollisionRecs(Player.dest_rect, tentTrigger)){
+        int textWidth = MeasureText("Press ENTER to start Typing Battle", 20);
+        DrawText("Press ENTER to start Typing Battle", (screenWidth - textWidth) / 2, 50, 20, BLACK);
+      }
 
-        DrawTexturePro(currentTexture,
-            {Player.currentFrame * currentFrameWidth, 0.0f, currentFrameWidth * static_cast<float>(Player.dir), currentFrameHeight},
-            drawRect, origin, rotation, WHITE);
+      if(CheckCollisionRecs(Player.dest_rect, settingsTrigger)){
+        int textWidth = MeasureText("Press ENTER to go to Settings", 20);
+        DrawText("Press ENTER to go to Settings", (screenWidth - textWidth) / 2, 50, 20, BLACK);
+      }
 
-            EndMode2D();
-            //Text to enter main game
-
-            if(CheckCollisionRecs(Player.dest_rect, tentTrigger)){
-              int textWidth = MeasureText("Press ENTER to start Typing Battle", 20);
-              DrawText("Press ENTER to start Typing Battle", (screenWidth - textWidth) / 2, 50, 20, BLACK);
-            }
-
-            if(CheckCollisionRecs(Player.dest_rect, settingsTrigger)){
-              int textWidth = MeasureText("Press ENTER to go to Settings", 20);
-              DrawText("Press ENTER to go to Settings", (screenWidth - textWidth) / 2, 50, 20, BLACK);
-            }
-
-            if(CheckCollisionRecs(Player.dest_rect, exitTrigger)){
-              int textWidth = MeasureText("Press ENTER to exit the game", 20);
-              DrawText("Press ENTER to exit the game", (screenWidth - textWidth) / 2, 50, 20, BLACK);
-            }
-            
-            EndDrawing();
+      if(CheckCollisionRecs(Player.dest_rect, exitTrigger)){
+        int textWidth = MeasureText("Press ENTER to exit the game", 20);
+        DrawText("Press ENTER to exit the game", (screenWidth - textWidth) / 2, 50, 20, BLACK);
+      }
+      EndDrawing();
     }
+    
     UnloadMusicStream(bgMusic);
     CloseAudioDevice();
     UnloadTexture(texGround);
@@ -358,4 +358,4 @@ int main(){
     CloseWindow();
 
     return 0;
-  }
+}
