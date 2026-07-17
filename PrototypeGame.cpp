@@ -276,7 +276,7 @@ void RunBattle(int level){
                     bullets[i].update();
 
                     for(int j = 0; j < (int)v.size(); j++){
-                        if(CheckCollisionRecs(bullets[i].body, v[j].body)){
+                        if(CheckCollisionRecs(bullets[i].body, v[j].body) and bullets[i].targetId == v[j].id){
                             bullets[i].active = false;
                             v[j].health--;
                             if(v[j].health <= 0){
