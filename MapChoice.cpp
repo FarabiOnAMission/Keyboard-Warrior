@@ -1,11 +1,19 @@
 #include<raylib.h>
 
+void RunBattle(int level);
+
 void RunChoice(){
   int selectedOption = 0;
   const int totalOptions = 3;
   bool inSettings = true;
 
+  bool KeyReleased = false;
+
   while(inSettings && !WindowShouldClose()){
+
+    if(IsKeyReleased(KEY_ENTER)){
+      KeyReleased=true;
+    }
 
     if(IsKeyPressed(KEY_DOWN)){
       selectedOption = (selectedOption + 1 )% totalOptions;
@@ -19,8 +27,18 @@ void RunChoice(){
       inSettings = false;
     }
 
-    if(IsKeyPressed(KEY_ENTER)){
-      
+    if(IsKeyPressed(KEY_ENTER) && KeyReleased){
+      if(selectedOption == 0){
+        RunBattle(1);
+      }
+
+      else if(selectedOption == 1){
+        RunBattle(2);
+      }
+
+      else if(selectedOption == 2){
+        RunBattle(3);
+      }
     }
 
     BeginDrawing();

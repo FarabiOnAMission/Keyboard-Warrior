@@ -92,8 +92,7 @@ struct BattlePlayer {
 };
 
 
-void RunBattle(){
-    int level=2;
+void RunBattle(int level){
     float time = 1.90f;
     bool locked = false;
     int locked_index = -1;

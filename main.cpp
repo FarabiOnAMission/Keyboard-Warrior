@@ -2,6 +2,7 @@
 #include "main-map.h"
 #include "PrototypeGame.cpp"
 #include "SettingMenu.cpp"
+#include "MapChoice.cpp"
 
 #define IDLE_LAST_FRAME 3
 #define IDLE_FIRST_FRAME 0
@@ -270,7 +271,7 @@ int main(){
         //Collision to check if the player entered the house where the main game should begin
         if(CheckCollisionRecs(Player.dest_rect, tentTrigger)){
           if(IsKeyPressed(KEY_ENTER)){
-            RunBattle();
+            RunChoice();
           }
         }
 
