@@ -138,8 +138,9 @@ void DrawMapLayer(const int MapArray[ROWS][COLS], Tileset tilesets[], int tilese
 }
 
 int main(){
-  InitWindow(800,600,"game");
-  SetTargetFPS(60);
+    InitWindow(800,600,"game");
+    InitAudioDevice();
+    SetTargetFPS(60);
 
     Texture2D texGround     = LoadTexture("resource/Floor Tiles1.png");
     Texture2D texSky        = LoadTexture("resource/GandalfHardcore Background layers_layer 5.png");
@@ -154,8 +155,12 @@ int main(){
     Texture2D texClouds     = LoadTexture("resource/cloud5.png");
     Texture2D texSun        = LoadTexture("resource/sun.png");
 
-  Texture2D player_idle_texture = LoadTexture("resource/Idle-Sheet.png");
-  Texture2D player_run_texture = LoadTexture("resource/Run-Sheet.png");
+    Texture2D player_idle_texture = LoadTexture("resource/Idle-Sheet.png");
+    Texture2D player_run_texture = LoadTexture("resource/Run-Sheet.png");
+
+    Music bgMusic = LoadMusicStream("resource/theme.ogg");
+    PlayMusicStream(bgMusic);
+    SetMusicVolume(bgMusic, 1.0f);
   
   float frameWidth = (float)player_idle_texture.width/4.0f; //Because my original frame has 4 characters so i need to start it from the beginning
   float frameHeight = (float)player_idle_texture.height;
@@ -217,7 +222,7 @@ int main(){
 
       move_player(&Player);
       apply_gravity(&Player);
-
+      UpdateMusicStream(bgMusic);
       apply_velocity(&Player);
       AnimatePlayer(&Player);
 
@@ -318,10 +323,21 @@ int main(){
               int textWidth = MeasureText("Press ENTER to start Typing Battle", 20);
               DrawText("Press ENTER to start Typing Battle", (screenWidth - textWidth) / 2, 50, 20, BLACK);
             }
+
+            if(CheckCollisionRecs(Player.dest_rect, settingsTrigger)){
+              int textWidth = MeasureText("Press ENTER to go to Settings", 20);
+              DrawText("Press ENTER to go to Settings", (screenWidth - textWidth) / 2, 50, 20, BLACK);
+            }
+
+            if(CheckCollisionRecs(Player.dest_rect, exitTrigger)){
+              int textWidth = MeasureText("Press ENTER to exit the game", 20);
+              DrawText("Press ENTER to exit the game", (screenWidth - textWidth) / 2, 50, 20, BLACK);
+            }
             
             EndDrawing();
     }
-
+    UnloadMusicStream(bgMusic);
+    CloseAudioDevice();
     UnloadTexture(texGround);
     UnloadTexture(texSky);
     UnloadTexture(texTent);
