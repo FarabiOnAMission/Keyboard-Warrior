@@ -109,7 +109,7 @@ void SaveHighScore(int newScore){
     }
 }
 
-void RunBattle(int level){
+bool RunBattle(int level){
     float time = 1.90f;
     bool locked = false;
     int locked_index = -1;
@@ -223,7 +223,8 @@ void RunBattle(int level){
                     isPaused = 0;
                 }
                 else if(pauseSelection == 1){
-                    return;
+                    SetWindowSize(800, 600);
+                    return true;
                 }
                 else {
                     CloseWindow();
@@ -448,27 +449,19 @@ void RunBattle(int level){
 
         // Teammate's Pause Screen Overlay
         if (isPaused) {
-            // Draw the dark overlay
+
             DrawRectangle(0, 0, 800, 800, Fade(BLACK, 0.8f)); 
-            
-            // Draw the PAUSED title
             int titleWidth = MeasureText("PAUSED", 60);
             DrawText("PAUSED", (800 - titleWidth) / 2, 250, 60, WHITE);
-
-            // Draw the 3 options
             const char* options[3] = {"Resume", "Return to Main Menu", "Exit Game"};
             
             for (int i = 0; i < 3; i++) {
                 Color textColor = LIGHTGRAY;
-                
-                // If this is the currently selected option, make it Yellow and add a cursor
                 if (i == pauseSelection) {
                     textColor = YELLOW;
                     int optWidth = MeasureText(options[i], 30);
                     DrawText(">", (800 - optWidth) / 2 - 30, 380 + (i * 60), 30, YELLOW);
                 }
-
-                // Draw the actual option text
                 int optWidth = MeasureText(options[i], 30);
                 DrawText(options[i], (800 - optWidth) / 2, 380 + (i * 60), 30, textColor);
             }
@@ -486,6 +479,6 @@ void RunBattle(int level){
 
     SetWindowSize(800, 600);
     SetWindowTitle("game");
-
-    CloseWindow();
+    return false;
+    // CloseWindow();
 }

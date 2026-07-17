@@ -1,6 +1,6 @@
 #include<raylib.h>
 
-void RunBattle(int level);
+bool RunBattle(int level); 
 
 void RunChoice(){
   int selectedOption = 0;
@@ -28,16 +28,15 @@ void RunChoice(){
     }
 
     if(IsKeyPressed(KEY_ENTER) && KeyReleased){
+      // 2. ADDED THE 'if' CHECKS TO CATCH THE TRUE SIGNAL
       if(selectedOption == 0){
-        RunBattle(1);
+        if (RunBattle(1)) return; 
       }
-
       else if(selectedOption == 1){
-        RunBattle(2);
+        if (RunBattle(2)) return;
       }
-
       else if(selectedOption == 2){
-        RunBattle(3);
+        if (RunBattle(3)) return;
       }
     }
 
