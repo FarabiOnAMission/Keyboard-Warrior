@@ -82,10 +82,11 @@ struct enemy {
 };
 
 struct BattlePlayer {
-    Rectangle body = {50, 500, 50, 50};
+    Rectangle body = {50, 500, 100, 100};
+    Texture2D* tex;
 
     void draw(){
-        DrawRectangleRec(body, BLUE);
+        DrawTexturePro(*tex,{0, 0, (float)tex->width, (float)tex->height},body,{0, 0},0.0f,WHITE);
     }
 };
 
@@ -122,6 +123,7 @@ void RunBattle(int level){
     Texture2D enemyTex;
     Texture2D bgTex;
     Texture2D arrowTex;
+    Texture2D heroTex;
     Color C;
     Music battleMusic;
 
@@ -129,8 +131,9 @@ void RunBattle(int level){
         enemyTex = LoadTexture("resource/GreenDemonFinal.png");
         bgTex    = LoadTexture("resource/GreenBGFinal.png");
         arrowTex = LoadTexture("resource/YellowArrow.png");
+        heroTex = LoadTexture("resource/RobinGreen.png");
         enemyspawner  = 1.5f;
-        enemyBodySize = 80;
+        enemyBodySize = 100;
         enemyValue    = 2;
         C = GREEN;
         battleMusic = LoadMusicStream("resource/level1.ogg");
@@ -139,8 +142,9 @@ void RunBattle(int level){
         enemyTex = LoadTexture("resource/BlueDemonFinal.png");
         bgTex    = LoadTexture("resource/BlueBGFinal.png");
         arrowTex = LoadTexture("resource/BlueArrow.png");
+        heroTex = LoadTexture("resource/RobinBlue.png");
         enemyspawner  = 1.3f;
-        enemyBodySize = 80;
+        enemyBodySize = 130;
         enemyValue    = 3;
         C = BLUE;
         battleMusic = LoadMusicStream("resource/level2.ogg");
@@ -149,8 +153,9 @@ void RunBattle(int level){
         enemyTex = LoadTexture("resource/RedDemonFinal.png");
         bgTex    = LoadTexture("resource/RedBGFinal.png");
         arrowTex = LoadTexture("resource/RedArrow.png");
+        heroTex = LoadTexture("resource/RobinRed.png");
         enemyspawner  = 1.1f;
-        enemyBodySize = 120;
+        enemyBodySize = 140;
         enemyValue    = 5;
         C = RED;
         battleMusic = LoadMusicStream("resource/level3.ogg");
@@ -172,6 +177,7 @@ void RunBattle(int level){
 
     Color Background = {20, 160, 193, 255};
     BattlePlayer player;
+    player.tex = &heroTex;
     vector<enemy> v;
     vector<Bullet> bullets;
     float bulletSpeed = 600.0f;
@@ -308,7 +314,7 @@ void RunBattle(int level){
                                 Bullet b;
                                 b.targetId = v[i].id;
                                 b.tex = &arrowTex;
-                                b.body = {player.body.x + 60, player.body.y + 25, 80, 40};
+                                b.body = {player.body.x + 60, player.body.y + 50, 80, 40};
                                 float diffX = v[i].body.x - player.body.x;
                                 float diffY = v[i].body.y - player.body.y;
                                 float dist  = sqrt((diffX * diffX) + (diffY * diffY));
@@ -332,7 +338,7 @@ void RunBattle(int level){
                             Bullet b;
                             b.targetId = v[locked_index].id;
                             b.tex = &arrowTex;
-                            b.body = {player.body.x + 60, player.body.y + 25, 80, 40};
+                            b.body = {player.body.x + 60, player.body.y + 50, 80, 40};
                             float diffX = v[locked_index].body.x - player.body.x;
                             float diffY = v[locked_index].body.y - player.body.y;
                             float dist  = sqrt((diffX * diffX) + (diffY * diffY));
@@ -414,6 +420,7 @@ void RunBattle(int level){
     UnloadTexture(arrowTex);
     UnloadTexture(enemyTex);
     UnloadTexture(bgTex);
+    UnloadTexture(heroTex); 
 
     SetWindowSize(800, 600);
     SetWindowTitle("game");
