@@ -83,7 +83,7 @@ struct enemy {
 };
 
 
-struct Player {
+struct BattlePlayer {
     Rectangle body = {50, 500, 50, 50};
 
     void draw(){
@@ -92,15 +92,14 @@ struct Player {
 };
 
 
-int main(){
-
-    int level = 3;
-
+void RunBattle(){
+    int level=2;
     float time = 1.90f;
     bool locked = false;
     int locked_index = -1;
 
-    InitWindow(800, 800, "Keyboard Warrior boutta be CRAAZZYYYY");
+    SetWindowSize(800, 800); 
+    SetWindowTitle("Keyboard Warrior boutta be CRAAZZYYYY");
     SetTargetFPS(60);
 
     float enemyspawner;
@@ -150,7 +149,7 @@ int main(){
     wordfile.close();
 
     Color Background = {20, 160, 193, 255};
-    Player player;
+    BattlePlayer player;
     vector<enemy> v;
     vector<Bullet> bullets;
     float bulletSpeed = 600.0f;
@@ -230,7 +229,7 @@ int main(){
                 }
 
                 if(bullets[i].body.x > 800 || bullets[i].body.x < 0 ||
-                   bullets[i].body.y > 800 || bullets[i].body.y < 0){
+                    bullets[i].body.y > 800 || bullets[i].body.y < 0){
                     bullets[i].active = false;
                 }
             }
@@ -296,7 +295,7 @@ int main(){
             }
             else{
                 if(v[locked_index].currentIndex < (int)v[locked_index].s.length() &&
-                   letter == v[locked_index].s[v[locked_index].currentIndex]){
+                    letter == v[locked_index].s[v[locked_index].currentIndex]){
 
                     Bullet b;
                     b.targetId = v[locked_index].id;
@@ -356,8 +355,11 @@ int main(){
     UnloadTexture(arrowTex);
     UnloadTexture(enemyTex);
     UnloadTexture(bgTex);
+
+    SetWindowSize(800, 600);
+    SetWindowTitle("game");
+
     CloseWindow();
-    return 0;
 }
 
 // g++ PrototypeGame.cpp -o PrototypeGame -lraylib -lm -lpthread -ldl && ./PrototypeGame
