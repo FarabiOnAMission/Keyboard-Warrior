@@ -124,6 +124,7 @@ void RunBattle(int level){
     Texture2D bgTex;
     Texture2D arrowTex;
     Color C;
+    Music battleMusic;
 
     if(level == 1){
         enemyTex = LoadTexture("resource/GreenDemonFinal.png");
@@ -133,6 +134,8 @@ void RunBattle(int level){
         enemyBodySize = 80;
         enemyValue    = 2;
         C = GREEN;
+
+        battleMusic = LoadMusicStream("resource/level1.ogg");
     }
     else if(level == 2){
         enemyTex = LoadTexture("resource/BlueDemonFinal.png");
@@ -142,6 +145,7 @@ void RunBattle(int level){
         enemyBodySize = 80;
         enemyValue    = 3;
         C = BLUE;
+        battleMusic = LoadMusicStream("resource/level2.ogg");
     }
     else if(level == 3){
         enemyTex = LoadTexture("resource/RedDemonFinal.png");
@@ -151,7 +155,12 @@ void RunBattle(int level){
         enemyBodySize = 120;
         enemyValue    = 5;
         C = RED;
+        battleMusic = LoadMusicStream("resource/level3.ogg");
     }
+
+    battleMusic.looping = true; 
+    PlayMusicStream(battleMusic);
+    SetMusicVolume(battleMusic, 0.8f);
 
     vector<string> Words;
     ifstream wordfile("words.txt");
@@ -176,6 +185,9 @@ void RunBattle(int level){
     while(!WindowShouldClose()){
 
         time += GetFrameTime();
+
+        UpdateMusicStream(battleMusic);
+
         if(time >= enemyspawner){
             time = 0;
             enemy NewEnemy;
@@ -372,9 +384,11 @@ void RunBattle(int level){
         EndDrawing();
     }
 
+    UnloadMusicStream(battleMusic);
     UnloadTexture(arrowTex);
     UnloadTexture(enemyTex);
     UnloadTexture(bgTex);
+
 
     SetWindowSize(800, 600);
     SetWindowTitle("game");
