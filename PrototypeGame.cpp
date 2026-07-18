@@ -19,8 +19,17 @@ struct Bullet {
     }
 
     void draw() {
+        
         float angle = atan2f(speedY, speedX) * (180.0f/3.1415926);
-        DrawTexturePro(*tex,{0, 0, (float)tex->width, (float)tex->height},body, {body.width / 2, body.height / 2},angle,WHITE);
+        DrawTexturePro(*tex,{0, 0, 
+            (float)tex->width,
+            (float)tex->height},
+            body,
+            {body.width / 2, body.height / 2},
+            angle,
+            WHITE
+        );
+    
     }
 };
 
