@@ -164,7 +164,7 @@ void LevelWiseTexture(int level){
         bgTex    = LoadTexture("resource/GreenBGFinal.png");
         arrowTex = LoadTexture("resource/YellowArrow.png");
         heroTex = LoadTexture("resource/RobinGreen.png");
-        enemyspawner  = 1.3f;
+        enemyspawner  = 1.5f;
         enemyBodySize = 100;
         enemyValue    = 2;
         C = GREEN;
@@ -176,7 +176,7 @@ void LevelWiseTexture(int level){
         bgTex    = LoadTexture("resource/BlueBGFinal.png");
         arrowTex = LoadTexture("resource/BlueArrow.png");
         heroTex = LoadTexture("resource/RobinBlue.png");
-        enemyspawner  = 1.0f;
+        enemyspawner  = 1.2f;
         enemyBodySize = 130;
         enemyValue    = 3;
         C = BLUE;
@@ -188,7 +188,7 @@ void LevelWiseTexture(int level){
         bgTex    = LoadTexture("resource/RedBGFinal.png");
         arrowTex = LoadTexture("resource/RedArrow.png");
         heroTex = LoadTexture("resource/RobinRed.png");
-        enemyspawner  = 0.7f;
+        enemyspawner  = 0.9f;
         enemyBodySize = 140;
         enemyValue    = 5;
         C = RED;
