@@ -6,6 +6,19 @@
 #include <fstream>
 using namespace std;
 
+
+float enemyspawner;
+float enemyBodySize;
+int enemyValue;
+Texture2D enemyTex;
+Texture2D bgTex;
+Texture2D arrowTex;
+Texture2D heroTex;
+Texture2D platformTex;
+Color C;
+Music battleMusic;
+
+
 struct Bullet {
     Rectangle body;
     float speedX, speedY;
@@ -144,26 +157,7 @@ void LevelStats(int level, enemy* NewEnemy){
 }
 
 
-bool RunBattle(int level){
-    float time = 1.90f;
-    bool locked = false;
-    int locked_index = -1;
-
-    SetWindowSize(800, 800); 
-    SetWindowTitle("Keyboard Warrior boutta be CRAAZZYYYY");
-    SetTargetFPS(60);
-
-    float enemyspawner;
-    float enemyBodySize;
-    int enemyValue;
-    Texture2D enemyTex;
-    Texture2D bgTex;
-    Texture2D arrowTex;
-    Texture2D heroTex;
-    Texture2D platformTex;
-    Color C;
-    Music battleMusic;
-
+void LevelWiseTexture(int level){
     if(level == 1){
         platformTex = LoadTexture("resource/PlatformGreen.png");
         enemyTex = LoadTexture("resource/GreenDemonFinal.png");
@@ -200,6 +194,19 @@ bool RunBattle(int level){
         C = RED;
         battleMusic = LoadMusicStream("resource/level3.ogg");
     }
+}
+
+
+bool RunBattle(int level){
+    float time = 1.90f;
+    bool locked = false;
+    int locked_index = -1;
+
+    SetWindowSize(800, 800); 
+    SetWindowTitle("Keyboard Warrior boutta be CRAAZZYYYY");
+    SetTargetFPS(60);
+
+    LevelWiseTexture(level);
 
     battleMusic.looping = true; 
     PlayMusicStream(battleMusic);
@@ -216,8 +223,6 @@ bool RunBattle(int level){
     wordfile.close();
 
     Color Background = {20, 160, 193, 255};
-
-    
 
     BattlePlayer player;
     player.tex = &heroTex;
