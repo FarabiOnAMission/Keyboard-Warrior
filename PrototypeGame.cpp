@@ -120,6 +120,13 @@ int HighScoreTrack(){
         HighScores>>highscore;
         HighScores.close();
     }
+    else{
+        std::ofstream InitialHighScore("highscore.save");
+        if(InitialHighScore.is_open()){
+            InitialHighScore<<0;
+            InitialHighScore.close();
+        }
+    }
     return highscore;
 }
 
