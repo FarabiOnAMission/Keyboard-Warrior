@@ -179,7 +179,7 @@ void LevelWiseTexture(int level){
         enemyspawner  = 1.2f;
         enemyBodySize = 130;
         enemyValue    = 3;
-        C = BLUE;
+        C = SKYBLUE;
         battleMusic = LoadMusicStream("resource/level2.ogg");
     }
     else if(level == 3){
