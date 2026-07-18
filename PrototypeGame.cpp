@@ -118,6 +118,32 @@ void SaveHighScore(int newScore){
     }
 }
 
+
+void LevelStats(int level, enemy* NewEnemy){
+    if(level == 1){
+        (*NewEnemy).frameSpeed   = 0.1f;
+        (*NewEnemy).totalFrames  = 16;
+        (*NewEnemy).cols         = 4;
+        (*NewEnemy).frameW       = 200;
+        (*NewEnemy).frameH       = 200;
+    }
+    else if(level == 2){
+        (*NewEnemy).frameSpeed   = 0.1f;
+        (*NewEnemy).totalFrames  = 16;
+        (*NewEnemy).cols         = 4;
+        (*NewEnemy).frameW       = 200;
+        (*NewEnemy).frameH       = 200;
+    }
+    else if(level == 3){
+        (*NewEnemy).frameSpeed   = 0.1f;
+        (*NewEnemy).totalFrames  = 4;
+        (*NewEnemy).cols         = 2;
+        (*NewEnemy).frameW       = 100;
+        (*NewEnemy).frameH       = 100;
+    }   
+}
+
+
 bool RunBattle(int level){
     float time = 1.90f;
     bool locked = false;
@@ -254,27 +280,7 @@ bool RunBattle(int level){
                     NewEnemy.tex = &enemyTex;
                     NewEnemy.id  = enemyIdCounter++;
 
-                    if(level == 1){
-                        NewEnemy.frameSpeed   = 0.1f;
-                        NewEnemy.totalFrames  = 16;
-                        NewEnemy.cols         = 4;
-                        NewEnemy.frameW       = 200;
-                        NewEnemy.frameH       = 200;
-                    }
-                    else if(level == 2){
-                        NewEnemy.frameSpeed   = 0.1f;
-                        NewEnemy.totalFrames  = 16;
-                        NewEnemy.cols         = 4;
-                        NewEnemy.frameW       = 200;
-                        NewEnemy.frameH       = 200;
-                    }
-                    else if(level == 3){
-                        NewEnemy.frameSpeed   = 0.1f;
-                        NewEnemy.totalFrames  = 4;
-                        NewEnemy.cols         = 2;
-                        NewEnemy.frameW       = 100;
-                        NewEnemy.frameH       = 100;
-                    }
+                    LevelStats(level, &NewEnemy);
 
                     int i = GetRandomValue(0, Words.size()-1);
                     NewEnemy.s      = Words[i];
