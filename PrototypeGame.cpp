@@ -246,6 +246,8 @@ bool RunBattle(int level){
     bool isPaused = false;
     int pauseSelection = 0;
 
+    float gameTime = 0.0f; 
+    float speedMultiplier = 1.0f;
     while(!WindowShouldClose()){
 
         // Keep the music running even if the game is paused!
@@ -284,7 +286,12 @@ bool RunBattle(int level){
         if (!isPaused) {
             
             if(!gameOver){
+
                 time += GetFrameTime();
+                gameTime += GetFrameTime();
+
+                speedMultiplier = 1.0f + gameTime * 0.02f;
+                if(speedMultiplier > 3.0f) speedMultiplier = 3.0f;
 
                 if(time >= enemyspawner){
                     time = 0;
@@ -304,8 +311,8 @@ bool RunBattle(int level){
                     float distanceX = -750;
                     float distanceY = 500 - valY;
                     float distance  = sqrt((distanceX * distanceX) + (distanceY * distanceY));
-                    NewEnemy.speedX = (distanceX / distance) * 100;
-                    NewEnemy.speedY = (distanceY / distance) * 100;
+                    NewEnemy.speedX = (distanceX / distance) * 100 * speedMultiplier;
+                    NewEnemy.speedY = (distanceY / distance) * 100 * speedMultiplier;
                     v.push_back(NewEnemy);
                 }
 
@@ -426,6 +433,7 @@ bool RunBattle(int level){
                     v.clear();
                     bullets.clear();
                     time = 1.9f;
+                    gameTime = 0.0f;
                 }
             }
         } 
@@ -439,6 +447,7 @@ bool RunBattle(int level){
         ClearBackground(Background);
 
         if(!gameOver){
+
             DrawTexturePro(bgTex, {0,0,(float)bgTex.width,(float)bgTex.height}, {0,0,800,800}, {0,0}, 0.0f, WHITE);
 
             DrawTexturePro(
