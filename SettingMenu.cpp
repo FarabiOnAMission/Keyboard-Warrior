@@ -1,6 +1,10 @@
 #include<raylib.h>
 #include<fstream>
 #include<string>
+#include "Credits.cpp"
+
+using namespace std;
+
 
 
 void RunSettings(){
@@ -37,11 +41,16 @@ void RunSettings(){
               currentHighScore = 0; 
           }
         }
+        if(selectedOption == 2){
+          Credits();
+          canSelect = false;
+        }
+
       }
     }
     BeginDrawing();
-    ClearBackground(SKYBLUE);
     if(showingScorecard){
+      ClearBackground(BLACK);
       int title = MeasureText("SCORECARD",40);
       DrawText("SCORECARD", (800 - title) / 2, 100, 40, WHITE);
 
@@ -53,6 +62,7 @@ void RunSettings(){
       DrawText("Press ESC or ENTER to return", (800 - promptWidth) / 2, 500, 20, GRAY);
     }
     else{
+    ClearBackground(SKYBLUE);
     int title = MeasureText("SETTINGS",40);
     DrawText("SETTINGS",(800 - title) / 2, 100, 40, WHITE);
 

@@ -3,14 +3,15 @@
         {
             "name": "Win32",
             "includePath": [
-                "C:/raylib/raylib/src/**"
+                "${workspaceFolder}/**",
+                "/opt/homebrew/include"
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE"
             ],
-            "compilerPath": "C:/raylib/w64devkit/bin/g++.exe",
+            "compilerPath": "/usr/bin/g++",
             "cStandard": "c11",
             "cppStandard": "gnu++20",
             "intelliSenseMode": "windows-clang-x64"

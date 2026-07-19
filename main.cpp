@@ -76,7 +76,8 @@ void move_player(Sprite *player){
     if (player->state != previousState) {
         player->currentFrame = 0;
         player->frameTimer = 0.0f;
-    }
+    }   //If the player state changes, reset the animation frame and timer,
+    //Its just that if a player changes state then the frameindex also changes, else it can overflow a specific state index
 }
 
 void apply_gravity(Sprite *player){
@@ -94,7 +95,6 @@ void apply_velocity(Sprite *player){
 
 void AnimatePlayer(Sprite *player){
   player->frameTimer += GetFrameTime();
-
   if(player->frameTimer >= player->frameSpeed){
     player->frameTimer = 0.0f;
     player->currentFrame++;
