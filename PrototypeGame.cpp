@@ -518,3 +518,5 @@ bool RunBattle(int level){
     return false;
     // CloseWindow();
 }
+
+// g++ main.cpp -o game -lraylib -lm -lpthread -ldl && ./game
